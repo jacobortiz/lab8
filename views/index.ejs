@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>US Quiz (Express Version)</title>
+  
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" 
+  rel="stylesheet" 
+  integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" 
+  crossorigin="anonymous">
+  
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+  <script>
+    $(document).ready(function(){
+      //Event Listeners
+      $(".q5choice").on("click", function(){
+      	 $(".q5choice").css("background-color",""); //resets background color
+      	 $(this).css("background-color","rgb(255, 255, 0)"); 
+      	 $("#q5").val($(this).attr("id"));//use to pass to the server the id of the image clicked on
+      })
+      
+      
+      $("#submitBtn").on("click", function(){
+        $.ajax({
+  
+              method: "GET",
+              url: "/gradeQuiz",
+              dataType: "json",
+              data: {  "q1": $("#q1").val(),
+                       "q2": $("#q2").val(),
+                      "q3a": $("#q3a").is(":checked"),
+                      "q3b": $("#q3b").is(":checked"),
+                      "q3c": $("#q3c").is(":checked"),
+                      "q3d": $("#q3d").is(":checked"),
+                       "q4": $("input[name=q4]:checked").val(),
+                       "q5": $("#q5").val()
+              },
+              
+              success: function(result,status) {
+                $("#totalScore").html("Total Score: " + result.score);
+                
+                if(result.score > 80) {
+                    $("#congrats").html("Congrats!");
+                }
+                
+                
+                for (let i=0; i < 5; i++) {
+                   $(`#q${i+1}Feedback`).html(result.feedback[i].fback);
+                }
+              }
+        
+        });//ajax
+      });//submitBtn
+      
+      
+    })//ready
+  </script>
+
+</head>
+<body class="text-center">
+
+  <h1 class="jumbotron"> US Geography Quiz <br> Express Version </h1>
+  
+  <!--<form>-->
+  
+  <h3><span id="markImg1"></span> What is the capital of California?</h3>
+  <input type="text" id="q1" name="q1" value="">
+  <br><br>
+   <div id="q1Feedback"></div>
+  <br>
+
+  <h3><span id="markImg2"></span>What is the longest river?</h3>
+    <select id="q2" name="q2">
+        <option value="">Select One</option>
+        <option value="ms">Mississippi</option>
+        <option selected value="mo">Missouri</option>
+        <option value="co">Colorado</option>
+        <option value="de">Delaware</option>
+    </select>
+    <br><br>
+  <div id="q2Feedback"></div>
+  <br>
+
+    <h3><span id="markImg3"></span>What presidents are carved into mount Rushmore?</h3>
+    <input type="checkbox" name="q3a" id="q3a"> <label for="q3a"> A. Jackson    </label> 
+    <input type="checkbox" name="q3b" id="q3b"> <label for="q3b">B. Franklin  </label>
+    <input type="checkbox" name="q3c" id="q3c"> <label for="q3c">T. Jefferson</label>
+    <input type="checkbox" name="q3d" id="q3d"> <label for="q3d">T. Roosevelt</label>
+    <br><br>
+    <div id="q3Feedback"></div>
+    <br>
+
+	<h3><span id="markImg4"></span>What is the smallest US state?</h3>
+	
+	<div id="choices"> 
+	
+	  <% q3Choices.forEach(function(choice){ %>
+	  
+	  <input type="radio" name="q4" value="<%=choice%>" id="<%=choice%>"> <label for="<%=choice%>"> <%=choice%> </label>
+	  
+	  <% }) %>
+	
+	</div>
+    <br><br>
+    <div id="q4Feedback"></div>
+    <br>
+    
+    <h3><span id="markImg5"></span>Which is the correct seal of California?</h3>
+    <img src="/img/seal1.png" alt= "seal1" class="q5choice" id="seal1">
+    <img src="/img/seal2.png" alt= "seal2" class="q5choice" id="seal2">
+    <img src="/img/seal3.png" alt= "seal3" class="q5choice" id="seal3">
+
+    <input type="hidden" id="q5" />
+    
+	<br><br>
+    <div id="q5Feedback"></div>
+    <br>
+
+    <button id="submitBtn" class="btn btn-outline-success"> Submit Quiz </button>
+    <br><br>
+
+    <h2 id="totalScore" class="text-info">Total Score:  </h2>
+    <h3 id="congrats" class="text-success"></h3>
+</body>
+</html>
